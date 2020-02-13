@@ -31,7 +31,7 @@ import logging
 from optparse import OptionParser
 from pprint import pprint
 from time import mktime, gmtime
-from util import write_file, hexdump
+#from util import write_file, hexdump
 from biplist import writePlist, readPlist, Data
 from struct import unpack, pack
 from time import mktime, gmtime, sleep, time
@@ -71,16 +71,17 @@ class MobileBackup2(MobileBackup):
         if not self.lockdown:
             raise Exception("Unable to start lockdown")
 
-        ProductVersion = self.lockdown.getValue("", "ProductVersion")
+        ProductVersion = self.lockdown.allValues['ProductVersion']
+        #ProductVersion = self.lockdown.getValue("", "ProductVersion")
         if ProductVersion and int(ProductVersion[:ProductVersion.find('.')]) < 5:
             raise DeviceVersionNotSupported
         self.start()
 
 
     def start(self):
-        self.udid = lockdown.getValue("", "UniqueDeviceID")
-        self.willEncrypt = lockdown.getValue("com.apple.mobile.backup", "WillEncrypt")
-        self.escrowBag = lockdown.getValue('', 'EscrowBag')
+        self.udid = self.lockdown.allValues["UniqueDeviceID"]
+        self.willEncrypt = self.lockdown.getValue("com.apple.mobile.backup", "WillEncrypt")
+        self.escrowBag = self.lockdown.getValue('', 'EscrowBag')
         self.afc = AFCClient(self.lockdown) #We need this to create lock files
         self.service = self.lockdown.startService("com.apple.mobilebackup2")
         #self.service = self.lockdown.startServiceWithEscrowBag("com.apple.mobilebackup2", self.escrowBag)
@@ -438,8 +439,16 @@ class MobileBackup2(MobileBackup):
 
         info["iTunes Settings"] = self.lockdown.getValue("com.apple.iTunes")
         self.logger.info("Creating %s", os.path.join(self.udid,"Info.plist"))
-        self.write_file(os.path.join(self.udid,"Info.plist"), plistlib.writePlistToString(info))
 
+        for applications in info["Applications"]:
+            if info["Applications"][applications]["PlaceholderIcon"] == None:
+                info["Applications"][applications]["PlaceholderIcon"] = ""
+            if info["Applications"][applications]["iTunesMetadata"] == None:
+                info["Applications"][applications]["iTunesMetadata"] = b""
+            if info["Applications"][applications]["ApplicationSINF"] == None:
+                info["Applications"][applications]["ApplicationSINF"] = b""
+
+        self.write_file(os.path.join(self.udid,"Info.plist"), plistlib.writePlistToString(info))
 
     def backup(self,fullBackup=True):
         #TODO set_sync_lock
