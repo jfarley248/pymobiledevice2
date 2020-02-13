@@ -375,6 +375,37 @@ class MobileBackup2(MobileBackup):
 #
 #    def remove_sync_lock(self):
 #        pass
+
+
+    def convert_prodtype_to_model(self, ProductType):
+        if ProductType == "iPhone125":
+            return "iPhone 11 Pro Max"
+        if ProductType == "iPhone123":
+            return "iPhone 11 Pro"
+        if ProductType == "iPhone121":
+            return "iPhone 11"
+        if ProductType == "iPhone114" or ProductType == "iPhone116":
+            return "iPhone XS Max"
+        if ProductType == "iPhone112":
+            return "iPhone XS"
+        if ProductType == "iPhone118":
+            return "iPhone XR"
+        if ProductType == "iPhone103" or ProductType == "iPhone106":
+            return "iPhone X"
+        if ProductType == "iPhone102" or ProductType == "iPhone105":
+            return "iPhone 8 Plus"
+        if ProductType == "iPhone101" or ProductType == "iPhone104":
+            return "iPhone 8"
+        if ProductType == "iPhone92" or ProductType == "iPhone94":
+            return "iPhone 7 Plus"
+        if ProductType == "iPhone91" or ProductType == "iPhone93":
+            return "iPhone 7"
+        if ProductType == "iPhone84":
+            return "iPhone SE"
+        if ProductType == "iPhone82":
+            return "iPhone 6s Plus"
+
+
     def create_info_plist(self):
         # Get device information
         device_info =  self.lockdown.allValues
@@ -383,12 +414,12 @@ class MobileBackup2(MobileBackup):
         instpxy = installation_proxy(self.lockdown)
         apps = instpxy.browse({"ApplicationType":"User"},
                               ["CFBundleIdentifier", "ApplicationSINF", "iTunesMetadata"])
-        # Create new info.plits
+        # Create new info.plist
         info = {"BuildVersion": device_info.get("BuildVersion") or "",
                 "DeviceName":  device_info.get("DeviceName") or "",
                 "Display Name": device_info.get("DeviceName") or "",
                 "GUID": "---",
-                "Product Name" : device_info.get("ProductName" or ""),
+                "Product Name" : self.convert_prodtype_to_model(device_info.get("ProductType" or "")) ,
                 "ProductType": device_info.get("ProductType") or "",
                 "ProductVersion": device_info.get("ProductVersion") or "",
                 "Serial Number": device_info.get("SerialNumber") or "",
