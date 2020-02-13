@@ -27,7 +27,7 @@ import os
 import datetime
 import plistlib
 import logging
-
+from psutil import disk_usage
 from optparse import OptionParser
 from pprint import pprint
 from time import mktime, gmtime
@@ -142,8 +142,8 @@ class MobileBackup2(MobileBackup):
         self.service.sendPlist(a)
 
     def mb2_handle_free_disk_space(self,msg):
-        s = os.statvfs(self.backupPath)
-        freeSpace = s.f_bsize * s.f_bavail
+        #s = os.statvfs(self.backupPath)
+        freeSpace = disk_usage(self.backupPath).free
         res = ["DLMessageStatusResponse", 0, "___EmptyParameterString___", freeSpace]
         self.service.sendPlist(res)
 
