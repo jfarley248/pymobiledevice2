@@ -226,7 +226,7 @@ class MobileBackup2(MobileBackup):
         done = 0
         while not done:
             device_filename = self.service.recv_raw()
-            if device_filename == "":
+            if device_filename == "" or device_filename == b'':
                 break
             backup_filename = self.service.recv_raw()
             self.logger.debug("Downloading: %s to %s", device_filename, backup_filename)
