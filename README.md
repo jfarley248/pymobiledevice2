@@ -1,6 +1,10 @@
 # pymobiledevice2
 Updates and Modifications to iOSForensics pymobiledevice package for the python implementation of the libimobiledevice cross-platform software library that talks the protocols to support iPhone®, iPod Touch®, iPad® and Apple TV® devices 
 
+# Supported Devices
+All iOS devices are supported.
+iOS 13 bug fixed thanks to Mathieu Renard
+
 # Requirements
 * Python 2.7 and 3.x
 
