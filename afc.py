@@ -29,7 +29,6 @@ import plistlib
 import posixpath
 import logging
 import re
-from progressbar import ProgressBar
 from construct.core import Struct
 from construct.lib.containers import Container
 from construct import Const,  Int64ul
@@ -349,7 +348,11 @@ class AFC2Client(object):
                 try:
                     self.dispatch_packet(AFC_OP_READ, struct.pack("<QQ", handle, toRead))
                     s, d = self.receive_data()
-                    local_file_handle.write(d)
+                    if len(d) == 0:
+                        print(local_file + " appears to be an empty file")
+                        local_file_handle.write(b"")
+                    else:
+                        local_file_handle.write(d)
                 except:
                     import traceback
                     traceback.print_exc()
@@ -548,14 +551,14 @@ class AFC2Client(object):
             if infos and infos.get('st_ifmt') == 'S_IFDIR':
 
                 '''Handle folder creating / pulling'''
-                if fd in windows_reserved_names:
+                if fd.upper() in windows_reserved_names:
                     fd = fd + "_MEAT_RENAMED"
                 self.handle_dir_pull(parent_dir, fd, output)
 
 
             else:
                 '''Handle file creating / pulling'''
-                if fd in windows_reserved_names:
+                if fd.upper() in windows_reserved_names:
                     fd = fd + "_MEAT_RENAMED"
                 self.handle_file_pull(parent_dir, fd, infos, output)
 
